@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.Vocabulary;
 import com.example.demo.repository.VocabularyRepository;
+import com.example.demo.service.VocabularyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,29 +23,22 @@ import java.util.Random;
 @Controller
 public class VocabularyController {
 
-    private static final Random random;
-
-    static {
-        random = new Random();
-    }
-
     @Autowired
-    VocabularyRepository vocabularyRepository;
+    VocabularyService vocabularyService;
 
-    @RequestMapping(value = "/vocabularys", method = RequestMethod.GET)
+    @RequestMapping(value = "/vocabularys", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Object> getVocabularys(){
-        int start = random.nextInt(480);
-        List<Vocabulary> vocabularies = vocabularyRepository.getVocabularys(start);
-        if (vocabularies == null){
+        List<Vocabulary> vocabularies = vocabularyService.getVocabularys();
+        if (vocabularies == null || vocabularies.size() == 0){
             return ResponseEntity.noContent().build();
         }
 
         return new ResponseEntity<>(vocabularies, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/vocabularys/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/vocabularys/{id}", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Object> getVocabulary(@PathVariable("id") int id){
-        Vocabulary vocabulary = vocabularyRepository.findById(id).get();
+        Vocabulary vocabulary = vocabularyService.getVocabulary(id);
         if (vocabulary.getId() == 0){
             return ResponseEntity.noContent().build();
         }
